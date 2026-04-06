@@ -1,0 +1,17 @@
+{
+  "name": "guilvagasbot",
+  "version": "1.0.0",
+  "description": "Bot de Discord que publica vagas periodicamente e menciona uma pessoa.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "rss-parser": "^3.13.0"
+  }
+}

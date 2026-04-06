@@ -1,0 +1,8 @@
+{
+  "discordToken": "coloque_o_token_do_bot_aqui",
+  "channelId": "coloque_o_id_do_canal_aqui",
+  "userId": "coloque_o_id_da_pessoa_aqui",
+  "jobsFeedUrl": "https://example.com/feed.xml",
+  "postIntervalMinutes": 60,
+  "maxJobsPerRun": 3
+}
