@@ -38,6 +38,27 @@ cp config.json.example config.json
 npm start
 ```
 
+## Deploy no Render
+
+Este projeto ja inclui um [render.yaml](/home/andrey/projects/guilvagasbot/render.yaml) para subir como Background Worker no Render.
+
+1. Suba este repositorio para GitHub ou GitLab.
+2. No Render, crie o servico a partir do Blueprint do repositorio.
+3. O Render vai criar um Background Worker usando:
+   - `buildCommand`: `pnpm install --frozen-lockfile`
+   - `startCommand`: `node scripts/render-start.js`
+4. Preencha as variaveis secretas no Render:
+   - `DISCORD_TOKEN`
+   - `GUILD_ID` opcional
+   - `CHANNEL_ID`
+   - `USER_ID`
+5. Se quiser, ajuste tambem:
+   - `VAGAS_SEARCH_TERMS`
+   - `RELATED_KEYWORDS`
+   - `MAX_JOBS_PER_RUN`
+
+No Render, o script [render-start.js](/home/andrey/projects/guilvagasbot/scripts/render-start.js) gera o `config.json` automaticamente a partir dessas variaveis antes de iniciar o bot.
+
 ## Comandos
 
 - `/help`: shows the available commands
@@ -69,3 +90,4 @@ npm start
 - O comando `/clearhistory` limpa o arquivo `data/seen-jobs.json`, permitindo reenviar vagas ja vistas
 - Se `guildId` estiver configurado, os comandos sao registrados apenas nesse servidor e costumam aparecer quase imediatamente
 - Se `guildId` nao estiver configurado, o registro continua global e pode levar mais tempo para propagar
+- Em plataformas como o Render, o arquivo `data/seen-jobs.json` fica no disco local do servico. Em um novo deploy ou recriacao da instancia, esse historico pode ser perdido

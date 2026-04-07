@@ -1,0 +1,22 @@
+services:
+  - type: worker
+    name: guilvagasbot
+    runtime: node
+    plan: starter
+    buildCommand: pnpm install --frozen-lockfile
+    startCommand: node scripts/render-start.js
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: GUILD_ID
+        sync: false
+      - key: CHANNEL_ID
+        sync: false
+      - key: USER_ID
+        sync: false
+      - key: VAGAS_SEARCH_TERMS
+        value: facas,supermercado
+      - key: RELATED_KEYWORDS
+        value: faca,facas,cutelaria,supermercado,mercado,varejo
+      - key: MAX_JOBS_PER_RUN
+        value: "3"
