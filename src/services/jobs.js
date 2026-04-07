@@ -36,23 +36,17 @@ function pickJobId(item) {
   return item.id || item.link || `${item.title || "sem-titulo"}-${item.publishedAt || Date.now()}`;
 }
 
-function formatJobMessage(item) {
+function formatJobsMessage(items) {
   const mention = `<@${config.userId}>`;
-  const title = item.title || "Nova vaga";
-  const company = item.company || "Empresa nao informada";
-  const level = item.level || "Nivel nao informado";
-  const location = item.location || "Localizacao nao informada";
-  const link = item.link || "Link nao informado";
-  const publishedAt = item.publishedAt || "Data nao informada";
+  const links = items
+    .map((item) => item.link || "Link nao informado")
+    .join("\n");
 
   return [
-    `${mention} achei uma vaga nova para voce!`,
-    `**${title}**`,
-    `Empresa: ${company}`,
-    `Nivel: ${level}`,
-    `Local: ${location}`,
-    `Publicada em: ${publishedAt}`,
-    `Link: ${link}`,
+    `${mention} está trabalhando???`,
+    "RECEBA A VAGA",
+    "",
+    links,
   ].join("\n");
 }
 
@@ -189,8 +183,9 @@ async function postJobsToChannel(channel) {
     return 0;
   }
 
+  await channel.send(formatJobsMessage(newJobs));
+
   for (const job of newJobs) {
-    await channel.send(formatJobMessage(job));
     seenJobs.add(pickJobId(job));
   }
 
@@ -199,6 +194,6 @@ async function postJobsToChannel(channel) {
 }
 
 module.exports = {
-  formatJobMessage,
+  formatJobsMessage,
   postJobsToChannel,
 };

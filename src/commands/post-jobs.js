@@ -7,7 +7,6 @@ module.exports = {
     .setName("postjobs")
     .setNameLocalizations({
       "pt-BR": "postarvagas",
-      "pt-PT": "publicarvagas",
       "es-ES": "publicarvacantes",
       "es-419": "publicarvacantes",
     })
@@ -15,7 +14,6 @@ module.exports = {
     .setDescriptionLocalizations({
       "en-GB": "Fetch new jobs and post them in the current channel.",
       "pt-BR": "Busca vagas novas e publica no canal atual.",
-      "pt-PT": "Procura novas vagas e publica-as no canal atual.",
       "es-ES": "Busca nuevas vacantes y las publica en el canal actual.",
       "es-419": "Busca nuevas vacantes y las publica en el canal actual.",
     }),

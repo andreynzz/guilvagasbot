@@ -6,7 +6,6 @@ module.exports = {
     .setName("help")
     .setNameLocalizations({
       "pt-BR": "ajuda",
-      "pt-PT": "ajuda",
       "es-ES": "ayuda",
       "es-419": "ayuda",
     })
@@ -14,7 +13,6 @@ module.exports = {
     .setDescriptionLocalizations({
       "en-GB": "Show the available commands.",
       "pt-BR": "Mostra os comandos disponiveis.",
-      "pt-PT": "Mostra os comandos disponiveis.",
       "es-ES": "Muestra los comandos disponibles.",
       "es-419": "Muestra los comandos disponibles.",
     }),

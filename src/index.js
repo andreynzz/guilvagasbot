@@ -11,7 +11,11 @@ const jobPoster = createJobPoster(client);
 
 registerInteractionHandler({ client, commands, config });
 
-client.once("ready", async () => {
+client.on("error", (error) => {
+  console.error("Erro no cliente do Discord:", error);
+});
+
+client.once("clientReady", async () => {
   console.log(`Bot conectado como ${client.user.tag}.`);
   await registerCommands({ client, commands, guildId: config.guildId });
   console.log(`Comandos carregados: ${[...commands.keys()].join(", ") || "nenhum"}.`);

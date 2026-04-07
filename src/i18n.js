@@ -3,6 +3,7 @@ const DEFAULT_LOCALE = "en-US";
 const DISCORD_FALLBACK_LOCALES = {
   "en-US": "en-GB",
   "en-GB": "en-US",
+  "pt-PT": "pt-BR",
   "es-419": "es-ES",
 };
 
@@ -20,12 +21,6 @@ const messages = {
     commandFailed: "I couldn't run that command right now.",
   },
   "pt-BR": {
-    commandsAvailable: "Comandos disponiveis:\n{commandsList}",
-    noNewJobs: "Nao encontrei vagas novas relacionadas a facas ou supermercado.",
-    postedJobs: "Publiquei {sentCount} vaga(s) nova(s) neste canal.",
-    commandFailed: "Nao consegui executar esse comando agora.",
-  },
-  "pt-PT": {
     commandsAvailable: "Comandos disponiveis:\n{commandsList}",
     noNewJobs: "Nao encontrei vagas novas relacionadas a facas ou supermercado.",
     postedJobs: "Publiquei {sentCount} vaga(s) nova(s) neste canal.",
