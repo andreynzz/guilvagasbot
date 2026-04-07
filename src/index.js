@@ -1,128 +1,53 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const Parser = require("rss-parser");
 const { Client, GatewayIntentBits } = require("discord.js");
+const config = require("./config");
+const { t } = require("./i18n");
+const { postJobsToChannel } = require("./services/jobs");
 
-const parser = new Parser();
+const commandsPath = path.join(__dirname, "commands");
 
-const dataDir = path.join(__dirname, "..", "data");
-const seenJobsPath = path.join(dataDir, "seen-jobs.json");
-const configPath = path.join(__dirname, "..", "config.json");
+function loadCommands() {
+  const commands = new Map();
+  const commandFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith(".js"));
 
-function loadConfig() {
-  if (!fs.existsSync(configPath)) {
-    throw new Error(
-      "O arquivo config.json nao foi encontrado. Crie-o a partir de config.json.example."
-    );
-  }
+  for (const file of commandFiles) {
+    const command = require(path.join(commandsPath, file));
 
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const parsed = JSON.parse(raw);
-
-  const requiredFields = ["discordToken", "channelId", "userId", "jobsFeedUrl"];
-
-  for (const field of requiredFields) {
-    if (!parsed[field]) {
-      throw new Error(`O campo ${field} em config.json e obrigatorio.`);
+    if (!command.data || !command.data.name || typeof command.execute !== "function") {
+      console.warn(`Comando ignorado por estar incompleto: ${file}`);
+      continue;
     }
+
+    commands.set(command.data.name, command);
   }
 
-  const config = {
-    discordToken: parsed.discordToken,
-    channelId: parsed.channelId,
-    userId: parsed.userId,
-    jobsFeedUrl: parsed.jobsFeedUrl,
-    postIntervalMinutes: Number(parsed.postIntervalMinutes || 60),
-    maxJobsPerRun: Number(parsed.maxJobsPerRun || 3),
-  };
-
-  if (Number.isNaN(config.postIntervalMinutes) || config.postIntervalMinutes <= 0) {
-    throw new Error("postIntervalMinutes precisa ser um numero maior que zero.");
-  }
-
-  if (Number.isNaN(config.maxJobsPerRun) || config.maxJobsPerRun <= 0) {
-    throw new Error("maxJobsPerRun precisa ser um numero maior que zero.");
-  }
-
-  return config;
+  return commands;
 }
 
-const config = loadConfig();
-
-function ensureDataFile() {
-  fs.mkdirSync(dataDir, { recursive: true });
-
-  if (!fs.existsSync(seenJobsPath)) {
-    fs.writeFileSync(seenJobsPath, JSON.stringify([], null, 2));
-  }
-}
-
-function loadSeenJobs() {
-  ensureDataFile();
-
-  try {
-    const raw = fs.readFileSync(seenJobsPath, "utf-8");
-    const parsed = JSON.parse(raw);
-    return new Set(Array.isArray(parsed) ? parsed : []);
-  } catch (error) {
-    console.warn("Nao foi possivel ler o historico de vagas. Um novo arquivo sera criado.");
-    fs.writeFileSync(seenJobsPath, JSON.stringify([], null, 2));
-    return new Set();
-  }
-}
-
-function saveSeenJobs(seenJobs) {
-  fs.writeFileSync(seenJobsPath, JSON.stringify([...seenJobs], null, 2));
-}
-
-function pickJobId(item) {
-  return (
-    item.guid ||
-    item.id ||
-    item.link ||
-    `${item.title || "sem-titulo"}-${item.pubDate || item.isoDate || Date.now()}`
-  );
-}
-
-function formatJobMessage(item) {
-  const mention = `<@${config.userId}>`;
-  const title = item.title || "Nova vaga";
-  const company = item.creator || item.author || "Empresa nao informada";
-  const link = item.link || "Link nao informado";
-  const publishedAt = item.isoDate || item.pubDate;
-
-  const publishedLabel = publishedAt
-    ? new Date(publishedAt).toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-      })
-    : "Data nao informada";
-
-  return [
-    `${mention} achei uma vaga nova para voce!`,
-    `**${title}**`,
-    `Empresa: ${company}`,
-    `Publicada em: ${publishedLabel}`,
-    `Link: ${link}`,
-  ].join("\n");
-}
-
-async function fetchNewJobs(seenJobs) {
-  const feed = await parser.parseURL(config.jobsFeedUrl);
-  const items = Array.isArray(feed.items) ? feed.items : [];
-
-  const unseenJobs = items
-    .filter((item) => !seenJobs.has(pickJobId(item)))
-    .slice(0, config.maxJobsPerRun);
-
-  return unseenJobs;
-}
+const commands = loadCommands();
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
 
 let isPosting = false;
+
+async function registerCommands() {
+  const payload = [...commands.values()].map((command) => command.data.toJSON());
+
+  if (config.guildId) {
+    const guild = await client.guilds.fetch(config.guildId);
+    await guild.commands.set(payload);
+    console.log(`Comandos registrados no servidor ${guild.name} (${guild.id}).`);
+    return;
+  }
+
+  await client.application.commands.set(payload);
+  console.log("Comandos registrados globalmente.");
+}
 
 async function postJobs() {
   if (isPosting) {
@@ -138,21 +63,14 @@ async function postJobs() {
       throw new Error("O canal configurado nao foi encontrado ou nao aceita mensagens.");
     }
 
-    const seenJobs = loadSeenJobs();
-    const newJobs = await fetchNewJobs(seenJobs);
+    const sentCount = await postJobsToChannel(channel);
 
-    if (newJobs.length === 0) {
+    if (sentCount === 0) {
       console.log("Nenhuma vaga nova encontrada neste ciclo.");
       return;
     }
 
-    for (const job of newJobs) {
-      await channel.send(formatJobMessage(job));
-      seenJobs.add(pickJobId(job));
-    }
-
-    saveSeenJobs(seenJobs);
-    console.log(`${newJobs.length} vaga(s) enviada(s) com sucesso.`);
+    console.log(`${sentCount} vaga(s) enviada(s) com sucesso.`);
   } catch (error) {
     console.error("Erro ao buscar ou enviar vagas:", error);
   } finally {
@@ -160,8 +78,38 @@ async function postJobs() {
   }
 }
 
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) {
+    return;
+  }
+
+  const command = commands.get(interaction.commandName.toLowerCase());
+
+  if (!command) {
+    return;
+  }
+
+  try {
+    await command.execute(interaction, { client, commands, config });
+  } catch (error) {
+    console.error(`Erro ao executar o comando ${interaction.commandName}:`, error);
+
+    if (interaction.deferred || interaction.replied) {
+      await interaction.editReply(t(interaction.locale, "commandFailed"));
+      return;
+    }
+
+    await interaction.reply({
+      content: t(interaction.locale, "commandFailed"),
+      ephemeral: true,
+    });
+  }
+});
+
 client.once("ready", async () => {
   console.log(`Bot conectado como ${client.user.tag}.`);
+  await registerCommands();
+  console.log(`Comandos carregados: ${[...commands.keys()].join(", ") || "nenhum"}.`);
   await postJobs();
 
   const intervalMs = config.postIntervalMinutes * 60 * 1000;
