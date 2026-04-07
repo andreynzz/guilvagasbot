@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
+const { replyEphemeral } = require("../discord/interaction-response");
 const { resolveLocale, t } = require("../i18n");
 
 module.exports = {
@@ -29,9 +30,9 @@ module.exports = {
       })
       .join("\n");
 
-    await interaction.reply({
-      content: t(interaction.locale, "commandsAvailable", { commandsList }),
-      ephemeral: true,
-    });
+    await replyEphemeral(
+      interaction,
+      t(interaction.locale, "commandsAvailable", { commandsList })
+    );
   },
 };

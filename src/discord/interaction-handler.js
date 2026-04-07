@@ -1,3 +1,7 @@
+const {
+  isUnknownInteractionError,
+  replyEphemeral,
+} = require("./interaction-response");
 const { t } = require("../i18n");
 
 function registerInteractionHandler({ client, commands, config }) {
@@ -15,6 +19,11 @@ function registerInteractionHandler({ client, commands, config }) {
     try {
       await command.execute(interaction, { client, commands, config });
     } catch (error) {
+      if (isUnknownInteractionError(error)) {
+        console.warn(`Interacao expirou durante /${interaction.commandName}.`);
+        return;
+      }
+
       console.error(`Erro ao executar o comando ${interaction.commandName}:`, error);
 
       if (interaction.deferred || interaction.replied) {
@@ -22,10 +31,7 @@ function registerInteractionHandler({ client, commands, config }) {
         return;
       }
 
-      await interaction.reply({
-        content: t(interaction.locale, "commandFailed"),
-        ephemeral: true,
-      });
+      await replyEphemeral(interaction, t(interaction.locale, "commandFailed"));
     }
   });
 }

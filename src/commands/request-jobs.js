@@ -2,6 +2,7 @@ const {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } = require("discord.js");
+const { deferEphemeralReply } = require("../discord/interaction-response");
 const { t } = require("../i18n");
 const { postJobsToChannel } = require("../services/jobs");
 
@@ -39,7 +40,11 @@ module.exports = {
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    const acknowledged = await deferEphemeralReply(interaction);
+
+    if (!acknowledged) {
+      return;
+    }
 
     const selectedUser = interaction.options.getUser("user", true);
     const sentCount = await postJobsToChannel(interaction.channel, {

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
+const { deferEphemeralReply } = require("../discord/interaction-response");
 const { t } = require("../i18n");
 const { postJobsToChannel } = require("../services/jobs");
 
@@ -18,7 +19,12 @@ module.exports = {
       "es-419": "Busca nuevas vacantes y las publica en el canal actual.",
     }),
   async execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    const acknowledged = await deferEphemeralReply(interaction);
+
+    if (!acknowledged) {
+      return;
+    }
+
     const sentCount = await postJobsToChannel(interaction.channel);
 
     if (sentCount === 0) {
