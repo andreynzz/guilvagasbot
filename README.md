@@ -44,15 +44,16 @@ Este projeto ja inclui um [render.yaml](/home/andrey/projects/guilvagasbot/rende
 
 1. Suba este repositorio para GitHub ou GitLab.
 2. No Render, crie o servico a partir do Blueprint do repositorio.
-3. O Render vai criar um Background Worker usando:
+3. Nao use Web Service para este projeto. Ele deve rodar como Background Worker.
+4. O Render vai criar um Background Worker usando:
    - `buildCommand`: `pnpm install --frozen-lockfile`
    - `startCommand`: `pnpm start`
-4. Preencha as variaveis secretas no Render:
+5. Preencha as variaveis secretas no Render:
    - `DISCORD_TOKEN`
    - `GUILD_ID` opcional
    - `CHANNEL_ID`
    - `USER_ID`
-5. Se quiser, ajuste tambem:
+6. Se quiser, ajuste tambem:
    - `VAGAS_SEARCH_TERMS`
    - `RELATED_KEYWORDS`
    - `MAX_JOBS_PER_RUN`
@@ -89,3 +90,4 @@ Este projeto ja inclui um [render.yaml](/home/andrey/projects/guilvagasbot/rende
 - Se `guildId` estiver configurado, os comandos sao registrados apenas nesse servidor e costumam aparecer quase imediatamente
 - Se `guildId` nao estiver configurado, o registro continua global e pode levar mais tempo para propagar
 - Em plataformas como o Render, o arquivo `data/seen-jobs.json` fica no disco local do servico. Em um novo deploy ou recriacao da instancia, esse historico pode ser perdido
+- O Render pode tentar usar Node muito novo se o `package.json` estiver solto. Este projeto trava em `20.x` para usar uma versao LTS
