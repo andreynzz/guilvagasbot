@@ -5,6 +5,5 @@
   "userId": "coloque_o_id_da_pessoa_aqui",
   "vagasSearchTerms": ["facas", "supermercado"],
   "relatedKeywords": ["faca", "facas", "cutelaria", "supermercado", "mercado", "varejo"],
-  "postIntervalMinutes": 60,
   "maxJobsPerRun": 3
 }

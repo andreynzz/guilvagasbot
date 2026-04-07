@@ -1,8 +1,11 @@
 const config = require("../config");
 const { postJobsToChannel } = require("./jobs");
 
+const SCHEDULED_HOURS = [10, 20];
+
 function createJobPoster(client) {
   let isPosting = false;
+  let nextRunTimeout = null;
 
   async function postJobs() {
     if (isPosting) {
@@ -33,15 +36,45 @@ function createJobPoster(client) {
     }
   }
 
+  function getNextRunDate(now = new Date()) {
+    const nextRun = new Date(now);
+    nextRun.setSeconds(0, 0);
+
+    for (const hour of SCHEDULED_HOURS) {
+      const candidate = new Date(now);
+      candidate.setHours(hour, 0, 0, 0);
+
+      if (candidate > now) {
+        return candidate;
+      }
+    }
+
+    nextRun.setDate(nextRun.getDate() + 1);
+    nextRun.setHours(SCHEDULED_HOURS[0], 0, 0, 0);
+    return nextRun;
+  }
+
+  function scheduleNextRun() {
+    if (nextRunTimeout) {
+      clearTimeout(nextRunTimeout);
+    }
+
+    const nextRun = getNextRunDate();
+    const delay = nextRun.getTime() - Date.now();
+
+    console.log(`Proximo envio agendado para ${nextRun.toLocaleString("pt-BR")}.`);
+
+    nextRunTimeout = setTimeout(async () => {
+      await postJobs();
+      scheduleNextRun();
+    }, delay);
+  }
+
   function startSchedule() {
-    const intervalMs = config.postIntervalMinutes * 60 * 1000;
-    setInterval(() => {
-      postJobs();
-    }, intervalMs);
+    scheduleNextRun();
   }
 
   return {
-    postJobs,
     startSchedule,
   };
 }

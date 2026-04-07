@@ -52,13 +52,8 @@ function loadConfig() {
     guildId: parsed.guildId ? String(parsed.guildId).trim() : null,
     vagasSearchTerms,
     relatedKeywords,
-    postIntervalMinutes: Number(parsed.postIntervalMinutes || 60),
     maxJobsPerRun: Number(parsed.maxJobsPerRun || 3),
   };
-
-  if (Number.isNaN(config.postIntervalMinutes) || config.postIntervalMinutes <= 0) {
-    throw new Error("postIntervalMinutes precisa ser um numero maior que zero.");
-  }
 
   if (Number.isNaN(config.maxJobsPerRun) || config.maxJobsPerRun <= 0) {
     throw new Error("maxJobsPerRun precisa ser um numero maior que zero.");

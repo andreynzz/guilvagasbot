@@ -30,7 +30,6 @@ cp config.json.example config.json
 - `userId`: ID da pessoa que será mencionada com `@`
 - `vagasSearchTerms`: lista de termos usados na busca do Vagas, como `["facas", "supermercado"]`
 - `relatedKeywords`: palavras-chave para deixar passar apenas vagas relacionadas ao tema desejado
-- `postIntervalMinutes`: intervalo entre verificações
 - `maxJobsPerRun`: quantidade máxima de vagas enviadas por ciclo
 
 ## Execução
@@ -43,6 +42,7 @@ npm start
 
 - `/help`: shows the available commands
 - `/postjobs`: fetches new jobs and posts them in the current channel
+- `/requestjobs user:@pessoa`: admin only, fetches new jobs and posts them mentioning the selected person
 
 ## Como funciona
 
@@ -51,10 +51,10 @@ npm start
 - Filtra as vagas para deixar passar apenas as relacionadas a `relatedKeywords`
 - Compara as vagas com o histórico salvo em `data/seen-jobs.json`
 - Envia apenas vagas novas
-- Marca a pessoa configurada com `<@userId>`
+- Envia uma mensagem com `@everyone` e menciona a pessoa configurada com `<@userId>`
 - Carrega e registra slash commands automaticamente da pasta `src/commands`
 - Usa nomes e descricoes em ingles por padrao, com localizacao por regiao
-- Repete o processo no intervalo definido
+- Agenda os envios diariamente para 10:00 e 20:00 no horario local da maquina
 
 ## Observações
 
@@ -62,5 +62,6 @@ npm start
 - Para este caso, o exemplo ja vem preparado para buscar vagas relacionadas a facas ou supermercado
 - Como agora os comandos sao slash commands, o bot nao precisa da Message Content Intent
 - As respostas dos comandos tambem respeitam o locale enviado pelo Discord quando houver traducao disponivel
+- O comando `/requestjobs` so pode ser usado por membros com permissao de administrador
 - Se `guildId` estiver configurado, os comandos sao registrados apenas nesse servidor e costumam aparecer quase imediatamente
 - Se `guildId` nao estiver configurado, o registro continua global e pode levar mais tempo para propagar

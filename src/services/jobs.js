@@ -36,14 +36,15 @@ function pickJobId(item) {
   return item.id || item.link || `${item.title || "sem-titulo"}-${item.publishedAt || Date.now()}`;
 }
 
-function formatJobsMessage(items) {
-  const mention = `<@${config.userId}>`;
+function formatJobsMessage(items, options = {}) {
+  const targetUserId = options.targetUserId || config.userId;
+  const mention = `<@${targetUserId}>`;
   const links = items
     .map((item) => item.link || "Link nao informado")
     .join("\n");
 
   return [
-    `${mention} está trabalhando???`,
+    `@everyone ${mention} está trabalhando???`,
     "RECEBA A VAGA",
     "",
     links,
@@ -176,14 +177,14 @@ async function fetchNewJobs() {
   return { seenJobs, newJobs: unseenJobs };
 }
 
-async function postJobsToChannel(channel) {
+async function postJobsToChannel(channel, options = {}) {
   const { seenJobs, newJobs } = await fetchNewJobs();
 
   if (newJobs.length === 0) {
     return 0;
   }
 
-  await channel.send(formatJobsMessage(newJobs));
+  await channel.send(formatJobsMessage(newJobs, options));
 
   for (const job of newJobs) {
     seenJobs.add(pickJobId(job));

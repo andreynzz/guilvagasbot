@@ -19,7 +19,6 @@ client.once("clientReady", async () => {
   console.log(`Bot conectado como ${client.user.tag}.`);
   await registerCommands({ client, commands, guildId: config.guildId });
   console.log(`Comandos carregados: ${[...commands.keys()].join(", ") || "nenhum"}.`);
-  await jobPoster.postJobs();
   jobPoster.startSchedule();
 });
 
