@@ -9,7 +9,9 @@ function formatJobsMessage(items, options = {}) {
 
   return [
     `@everyone ${mention} está trabalhando???`,
-    "RECEBA A VAGA",
+    "**NÃO**, MAS TEM VAGA NOVA!!!",
+    "",
+    "RECEBA A VAGA:",
     "",
     links,
   ].join("\n");

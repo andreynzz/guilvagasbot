@@ -1,5 +1,6 @@
 const config = require("../config");
 const { formatJobsMessage } = require("./job-message");
+const { createJobEmbeds, fetchJobPreview } = require("./job-preview");
 const { loadSeenJobs, saveSeenJobs } = require("./job-store");
 const { fetchVagasJobs, pickJobId } = require("./vagas-search");
 
@@ -21,9 +22,15 @@ async function postJobsToChannel(channel, options = {}) {
     return 0;
   }
 
-  await channel.send(formatJobsMessage(newJobs, options));
+  const jobsWithPreview = await Promise.all(newJobs.map((job) => fetchJobPreview(job)));
+  const embeds = createJobEmbeds(jobsWithPreview);
 
-  for (const job of newJobs) {
+  await channel.send({
+    content: formatJobsMessage(jobsWithPreview, options),
+    embeds,
+  });
+
+  for (const job of jobsWithPreview) {
     seenJobs.add(pickJobId(job));
   }
 

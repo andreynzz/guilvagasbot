@@ -43,6 +43,7 @@ npm start
 - `/help`: shows the available commands
 - `/postjobs`: fetches new jobs and posts them in the current channel
 - `/requestjobs user:@pessoa`: admin only, fetches new jobs and posts them mentioning the selected person
+- `/clearhistory`: admin only, clears the history of already sent jobs
 
 ## Como funciona
 
@@ -52,9 +53,11 @@ npm start
 - Compara as vagas com o histórico salvo em `data/seen-jobs.json`
 - Envia apenas vagas novas
 - Envia uma mensagem com `@everyone` e menciona a pessoa configurada com `<@userId>`
+- Tenta anexar uma imagem de preview de cada vaga usando `og:image` da propria pagina
 - Carrega e registra slash commands automaticamente da pasta `src/commands`
 - Usa nomes e descricoes em ingles por padrao, com localizacao por regiao
 - Agenda os envios diariamente para 10:00 e 20:00 no horario local da maquina
+- Quando nao encontra vagas novas, responde com uma mensagem informando que vai tentar novamente depois
 
 ## Observações
 
@@ -63,5 +66,6 @@ npm start
 - Como agora os comandos sao slash commands, o bot nao precisa da Message Content Intent
 - As respostas dos comandos tambem respeitam o locale enviado pelo Discord quando houver traducao disponivel
 - O comando `/requestjobs` so pode ser usado por membros com permissao de administrador
+- O comando `/clearhistory` limpa o arquivo `data/seen-jobs.json`, permitindo reenviar vagas ja vistas
 - Se `guildId` estiver configurado, os comandos sao registrados apenas nesse servidor e costumam aparecer quase imediatamente
 - Se `guildId` nao estiver configurado, o registro continua global e pode levar mais tempo para propagar

@@ -30,7 +30,13 @@ function saveSeenJobs(seenJobs) {
   fs.writeFileSync(seenJobsPath, JSON.stringify([...seenJobs], null, 2));
 }
 
+function clearSeenJobs() {
+  ensureDataFile();
+  fs.writeFileSync(seenJobsPath, JSON.stringify([], null, 2));
+}
+
 module.exports = {
+  clearSeenJobs,
   loadSeenJobs,
   saveSeenJobs,
 };
