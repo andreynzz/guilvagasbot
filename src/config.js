@@ -1,58 +1,52 @@
-const fs = require("node:fs");
-const path = require("node:path");
+require("dotenv").config();
 
-const configPath = path.join(__dirname, "..", "config.json");
-
-function loadConfig() {
-  if (!fs.existsSync(configPath)) {
-    throw new Error(
-      "O arquivo config.json nao foi encontrado. Crie-o a partir de config.json.example."
-    );
+function parseList(value, fallback) {
+  if (!value) {
+    return fallback;
   }
 
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const parsed = JSON.parse(raw);
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
-  const requiredFields = ["discordToken", "channelId", "userId"];
+function loadConfig() {
+  const requiredEnvVars = ["DISCORD_TOKEN", "CHANNEL_ID", "USER_ID"];
 
-  for (const field of requiredFields) {
-    if (!parsed[field]) {
-      throw new Error(`O campo ${field} em config.json e obrigatorio.`);
+  for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar]) {
+      throw new Error(`A variavel de ambiente ${envVar} e obrigatoria.`);
     }
   }
 
-  const rawSearchTerms = Array.isArray(parsed.vagasSearchTerms)
-    ? parsed.vagasSearchTerms
-    : [parsed.vagasSearchTerm || "supermercado"];
-
-  const vagasSearchTerms = rawSearchTerms
-    .map((term) => String(term || "").trim())
-    .filter(Boolean);
+  const vagasSearchTerms = parseList(process.env.VAGAS_SEARCH_TERMS, ["facas", "supermercado"]);
 
   if (vagasSearchTerms.length === 0) {
-    throw new Error("config.json precisa ter vagasSearchTerm ou vagasSearchTerms.");
+    throw new Error("VAGAS_SEARCH_TERMS precisa ter pelo menos um termo.");
   }
 
-  const rawKeywords = Array.isArray(parsed.relatedKeywords)
-    ? parsed.relatedKeywords
-    : ["faca", "facas", "cutelaria", "supermercado", "mercado", "varejo"];
-
-  const relatedKeywords = rawKeywords
-    .map((keyword) => String(keyword || "").trim().toLowerCase())
-    .filter(Boolean);
+  const relatedKeywords = parseList(process.env.RELATED_KEYWORDS, [
+    "faca",
+    "facas",
+    "cutelaria",
+    "supermercado",
+    "mercado",
+    "varejo",
+  ]).map((keyword) => keyword.toLowerCase());
 
   if (relatedKeywords.length === 0) {
-    throw new Error("relatedKeywords precisa ter pelo menos uma palavra-chave.");
+    throw new Error("RELATED_KEYWORDS precisa ter pelo menos uma palavra-chave.");
   }
 
   const config = {
-    discordToken: parsed.discordToken,
-    channelId: parsed.channelId,
-    userId: parsed.userId,
-    guildId: parsed.guildId ? String(parsed.guildId).trim() : null,
+    discordToken: process.env.DISCORD_TOKEN,
+    channelId: process.env.CHANNEL_ID,
+    userId: process.env.USER_ID,
+    guildId: process.env.GUILD_ID ? String(process.env.GUILD_ID).trim() : null,
     vagasSearchTerms,
     relatedKeywords,
-    maxJobsPerRun: Number(parsed.maxJobsPerRun || 3),
+    maxJobsPerRun: Number(process.env.MAX_JOBS_PER_RUN || 3),
   };
 
   if (Number.isNaN(config.maxJobsPerRun) || config.maxJobsPerRun <= 0) {

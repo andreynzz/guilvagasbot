@@ -1,9 +1,0 @@
-{
-  "discordToken": "coloque_o_token_do_bot_aqui",
-  "guildId": "coloque_o_id_do_servidor_para_registro_rapido_opcional",
-  "channelId": "coloque_o_id_do_canal_aqui",
-  "userId": "coloque_o_id_da_pessoa_aqui",
-  "vagasSearchTerms": ["facas", "supermercado"],
-  "relatedKeywords": ["faca", "facas", "cutelaria", "supermercado", "mercado", "varejo"],
-  "maxJobsPerRun": 3
-}

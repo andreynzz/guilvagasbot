@@ -19,18 +19,18 @@ npm install
 2. Copie o arquivo de exemplo:
 
 ```bash
-cp config.json.example config.json
+cp .env.example .env
 ```
 
-3. Preencha os campos no `config.json`:
+3. Preencha os campos no `.env`:
 
-- `discordToken`: token do bot
-- `guildId`: ID do servidor para registrar os slash commands rapidamente no ambiente de teste. Opcional
-- `channelId`: ID do canal onde as vagas serão postadas
-- `userId`: ID da pessoa que será mencionada com `@`
-- `vagasSearchTerms`: lista de termos usados na busca do Vagas, como `["facas", "supermercado"]`
-- `relatedKeywords`: palavras-chave para deixar passar apenas vagas relacionadas ao tema desejado
-- `maxJobsPerRun`: quantidade máxima de vagas enviadas por ciclo
+- `DISCORD_TOKEN`: token do bot
+- `GUILD_ID`: ID do servidor para registrar os slash commands rapidamente no ambiente de teste. Opcional
+- `CHANNEL_ID`: ID do canal onde as vagas serão postadas
+- `USER_ID`: ID da pessoa que será mencionada com `@`
+- `VAGAS_SEARCH_TERMS`: lista separada por virgulas, como `facas,supermercado`
+- `RELATED_KEYWORDS`: palavras-chave separadas por virgulas para deixar passar apenas vagas relacionadas ao tema desejado
+- `MAX_JOBS_PER_RUN`: quantidade máxima de vagas enviadas por ciclo
 
 ## Execução
 
@@ -46,7 +46,7 @@ Este projeto ja inclui um [render.yaml](/home/andrey/projects/guilvagasbot/rende
 2. No Render, crie o servico a partir do Blueprint do repositorio.
 3. O Render vai criar um Background Worker usando:
    - `buildCommand`: `pnpm install --frozen-lockfile`
-   - `startCommand`: `node scripts/render-start.js`
+   - `startCommand`: `pnpm start`
 4. Preencha as variaveis secretas no Render:
    - `DISCORD_TOKEN`
    - `GUILD_ID` opcional
@@ -56,8 +56,6 @@ Este projeto ja inclui um [render.yaml](/home/andrey/projects/guilvagasbot/rende
    - `VAGAS_SEARCH_TERMS`
    - `RELATED_KEYWORDS`
    - `MAX_JOBS_PER_RUN`
-
-No Render, o script [render-start.js](/home/andrey/projects/guilvagasbot/scripts/render-start.js) gera o `config.json` automaticamente a partir dessas variaveis antes de iniciar o bot.
 
 ## Comandos
 
